@@ -22,17 +22,22 @@ tree = discord.app_commands.CommandTree(client=client)
 GUILD = discord.Object(id=1413015897039306786)
 
 
-@tree.command()
-async def test(interaction):
+@tree.command(name="next", guild=GUILD)
+async def next(interaction, sender: str, receiver: str, value: str):
+    print(sender, receiver)
+    print(value)
     await interaction.response.send_message("sup")
 
 
 @client.event
 async def on_ready():
     try:
-        await tree.sync(
+        synced = await tree.sync(
             guild=GUILD
         )  # register the slash command  #initializing the slash command in specific sever only
+        print(f"Synced {len(synced)} commands")
+        for cmd in synced:
+            print(cmd.name)
 
     except Exception as e:
         print(e)
@@ -42,6 +47,12 @@ async def on_ready():
 @client.event
 async def on_message(message):
     if message.author == client.user:
+        return
+
+    if message.mention_everyone:
+        return
+
+    if client.user not in message.mentions:
         return
 
     print(message.content)

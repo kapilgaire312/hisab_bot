@@ -1,6 +1,4 @@
-import json
 import os
-from dis import disco
 
 import discord
 from dotenv import load_dotenv
@@ -19,7 +17,8 @@ tree = discord.app_commands.CommandTree(client=client)
 
 
 # targeting a specific server is faster when developing.
-GUILD = discord.Object(id=1413015897039306786)
+guild_id = os.getenv("GUILD_ID")
+GUILD = discord.Object(id=guild_id)
 
 
 @tree.command(name="next", guild=GUILD)

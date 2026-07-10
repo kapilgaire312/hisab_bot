@@ -7,33 +7,35 @@ create_db = f"Create database {db_name}"
 
 create_all_tables = """
 
-CREATE TABLE User (
+CREATE TABLE users (
 uid INT PRIMARY KEY,
 name VARCHAR(100),
 added_date DATE DEFAULT CURRENT_DATE
 );
 
-CREATE TABLE Expense (
+CREATE TABLE expenses (
 eid SERIAL PRIMARY KEY,
-payer INT REFERENCES User(id),
+payer INT REFERENCES users(uid),
 description VARCHAR(300),
-listed_by INT REFERENCES User(id),
-amount INT,
+listed_by INT REFERENCES users(uid),
+amount NUMERIC(10,2),
 added_date DATE DEFAULT CURRENT_DATE
 );
 
 
-CREATE TABLE Participant(
-participant INT REFERENCES User(id),
-amount INT
+CREATE TABLE expense_participants(
+uid INT REFERENCES users(uid),
+eid INT REFERENCES expenses(eid),
+share NUMERIC(10,2),
+PRIMARY KEY(eid, uid)
 );
 
 
 
-CREATE TABLE Repayment(
-sender INT REFERENCES User(id),
-receiver INT REFERENCES User(id),
-amount INT,
+CREATE TABLE repayments(
+sender INT REFERENCES users(uid),
+receiver INT REFERENCES users(uid),
+amount NUMERIC(10,2),
 note VARCHAR(200),
 added_date DATE DEFAULT CURRENT_DATE
 
@@ -41,25 +43,27 @@ added_date DATE DEFAULT CURRENT_DATE
 """
 
 
+# delete entire database
+delete_db = f"DROP DATABASE {db_name};"
+
+
+# add vaues
 add_expense = """
-    INSERT INTO Expense(payer, description, listed_by, amount)
-    VALUES (%s,%s,%s,%s);
+    INSERT INTO expenses(payer, description, listed_by, amount)
+    VALUES (%s,%s:,%s,%s);
 """
 
 add_participant = """
-    INSERT INTO Participant (participant,amount)
-    VALUES (%s,%s);
+    INSERT INTO expense_participants (uid,eid,share)
+    VALUES (%s,%s,%s);
 """
 
 add_user = """
-    INSERT INTO User(uid,name)
+    INSERT INTO users(uid,name)
     VALUES(%s,%s);
 """
 
 add_repayment = """
-    INSERT INTO Repayment(sender, receiver,amount, note)
+    INSERT INTO repayments(sender, receiver,amount, note)
     VALUES(%s,%s,%s,%s) 
 """
-
-
-

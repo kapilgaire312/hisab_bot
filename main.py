@@ -21,11 +21,86 @@ guild_id = os.getenv("GUILD_ID")
 GUILD = discord.Object(id=guild_id)
 
 
-@tree.command(name="next", guild=GUILD)
-async def next(interaction, sender: str, receiver: str, value: str):
-    print(sender, receiver)
-    print(value)
-    await interaction.response.send_message("sup")
+@tree.command(
+    name="initiliazebot",
+    description="Initialize the bot with all the members in the server.",
+    guild=GUILD,
+)
+async def initialize_bot(interaction):
+    await interaction.response.send_message(
+        "Hisab Bot initialized successfully in this server for all members."
+    )
+
+
+@tree.command(
+    name="initiliazebotwithexception",
+    description="Initialize the bot by excluding certain members.",
+    guild=GUILD,
+)
+async def initialize_bot_with_exception(interaction, exclude: discord.Member):
+    await interaction.response.send_message(
+        "Hisab Bot initialized successfully in this server excluding certain members."
+    )
+
+
+@tree.command(name="expense", description="Add new shared expense.", guild=GUILD)
+async def expense(
+    interaction, payer: discord.Member, description: str, amount: int, participants: str
+):
+    print(payer.id, description)
+    print(amount, participants)
+    await interaction.response.send_message("Added the transaction.")
+
+
+@tree.command(name="repay", description="Log repayment info to the bot.", guild=GUILD)
+async def repay(interaction, receiver: discord.Member, amount: int, note: str):
+    print(amount, note)
+    await interaction.response.send_message(
+        f"{interaction.user} payed {amount} to {receiver.name}."
+    )
+
+
+@tree.command(
+    name="balance", description="Shows how much debt/credit a user has.", guild=GUILD
+)
+async def balance(interaction, user: discord.Member):
+    await interaction.response.send_message("hello")
+
+
+@tree.command(
+    name="history",
+    description="Shows all user transactions from last cleared date.",
+    guild=GUILD,
+)
+async def history(interaction, user: discord.Member):
+    await interaction.response.send_message("Your history")
+
+
+@tree.command(
+    name="historyall",
+    description="Shows all transactions from last cleared date.",
+    guild=GUILD,
+)
+async def historyall(interaction):
+    await interaction.response.send_message("Your history")
+
+
+@tree.command(
+    name="delete",
+    description="Delete a expense using its id.",
+    guild=GUILD,
+)
+async def delete_expense(interaction, id: str):
+    await interaction.response.send_message("the expense was deleted successfully.")
+
+
+@tree.command(
+    name="export",
+    description="Export all data since initialization as csv.",
+    guild=GUILD,
+)
+async def export(interaction):
+    await interaction.response.send_message("Your file will be exported.")
 
 
 @client.event

@@ -3,11 +3,14 @@ import os
 import discord
 from dotenv import load_dotenv
 
+from database.handlers import create_database, delete_database
+
 load_dotenv()
 
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 
 
 client = discord.Client(intents=intents)
@@ -27,6 +30,8 @@ GUILD = discord.Object(id=guild_id)
     guild=GUILD,
 )
 async def initialize_bot(interaction):
+    print(interaction.guild.members)
+    create_database()
     await interaction.response.send_message(
         "Hisab Bot initialized successfully in this server for all members."
     )
@@ -41,6 +46,16 @@ async def initialize_bot_with_exception(interaction, exclude: discord.Member):
     await interaction.response.send_message(
         "Hisab Bot initialized successfully in this server excluding certain members."
     )
+
+
+@tree.command(
+    name="deletedb",
+    description="!!!!Delete the entire database. This cant be undone. Export a copy first.",
+    guild=GUILD,
+)
+async def delete_db(interaction):
+    delete_database()
+    await interaction.response.send_message("Entire database deleted successfully.")
 
 
 @tree.command(name="expense", description="Add new shared expense.", guild=GUILD)
@@ -121,6 +136,9 @@ async def on_ready():
 @client.event
 async def on_message(message):
     if message.author == client.user:
+        return
+
+    if message.reference is not None:  # if the message is a reply
         return
 
     if message.mention_everyone:

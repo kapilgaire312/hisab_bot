@@ -1,6 +1,10 @@
 import re
 
 
+def returnMessage(error: bool, message: str):
+    return {"error": error, "message": message}
+
+
 def get_member_id_from_string(members_str: str):
     if not members_str.strip():
         return []

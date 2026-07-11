@@ -1,6 +1,9 @@
-from database.handlers import get_all_user_ids, save_expense
-from utils.custom_errors import ExpenseSaveError, UserIdsFetchError
-from utils.utils import get_member_id_and_share
+import re
+from email import message
+
+from database.handlers import get_all_user_ids, save_expense, save_repayment
+from utils.custom_errors import ExpenseSaveError, RepaymentSaveError, UserIdsFetchError
+from utils.utils import get_member_id_and_share, returnMessage
 
 
 def add_expense(
@@ -10,6 +13,12 @@ def add_expense(
     # check the payer and participants id to see they are in the db.
     # then make new query of adding the expense and participipants
     try:
+        if amount < 0:
+            return {
+                "error": True,
+                "message": "Amount cannot be negative.",
+            }
+
         user_ids = get_all_user_ids()
 
         if payer_id not in user_ids:
@@ -76,3 +85,37 @@ def add_expense(
             "error": True,
             "message": "Failed to add expense. Unexpected error occured.",
         }
+
+
+def add_repayment(sender: int, receiver: int, amount: float, note: str):
+    # check if the sender and receiver are valid members.
+    if amount < 0:
+        return returnMessage(True, message="Amount can't be negative")
+
+    try:
+        user_ids = get_all_user_ids()
+        if sender not in user_ids or receiver not in user_ids:
+            return returnMessage(
+                True,
+                "Sender or Receiver is not a valid member when bot was initialized",
+            )
+
+        # call the databse to save the repayment
+        save_repayment(sender, receiver, amount, note)
+
+        # return success
+        return returnMessage(False, "Saved the repayment successfully.")
+
+    except UserIdsFetchError:
+        return returnMessage(True, "Failed to save repayment. Couldn't access users.")
+
+    except RepaymentSaveError:
+        return returnMessage(
+            True, "Failed to save repayment. Error occured in saving to databse."
+        )
+
+    except Exception as e:
+        print(e)
+        return returnMessage(
+            True, "Failed to save repayment. Unexpected error occured."
+        )

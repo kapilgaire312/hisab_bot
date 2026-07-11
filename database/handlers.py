@@ -1,4 +1,5 @@
 import os
+import re
 
 from dotenv import load_dotenv
 
@@ -6,6 +7,7 @@ from database.connect import get_connection
 from database.queries import (
     add_expense_query,
     add_participant_query,
+    add_repayment_query,
     add_user_query,
     create_all_tables,
     create_db,
@@ -15,6 +17,7 @@ from database.queries import (
 from utils.custom_errors import (
     DatabaseCreationFailedError,
     ExpenseSaveError,
+    RepaymentSaveError,
     UserIdsFetchError,
     UserTableInitializeError,
 )
@@ -109,3 +112,14 @@ def save_expense(
                 conn.rollback()
                 print(e)
                 raise ExpenseSaveError from e
+
+
+def save_repayment(sender: int, receiver: int, amount: float, note: str):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(add_repayment_query, (sender, receiver, amount, note))
+
+    except Exception as e:
+        print(e)
+        raise RepaymentSaveError from e

@@ -20,3 +20,9 @@ class ExpenseSaveError(Exception):
     """Errror raised when it fails to save the expense or participants"""
 
     pass
+
+
+class RepaymentSaveError(Exception):
+    """Error raised when it fails to save the repayment to databse"""
+
+    pass

@@ -47,3 +47,11 @@ def get_member_id_and_share(values_string: str):
             pass
     print(id_share_pair)
     return (id_share_pair, participant_ids)
+
+
+def get_formatted_member_share(participants):
+    result = ""
+    for participant in participants:
+        result += f"<@{participant.get('id')}> : {participant.get('share')} \n"
+
+    return result

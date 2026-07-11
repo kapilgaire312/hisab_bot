@@ -3,7 +3,11 @@ from email import message
 
 from database.handlers import get_all_user_ids, save_expense, save_repayment
 from utils.custom_errors import ExpenseSaveError, RepaymentSaveError, UserIdsFetchError
-from utils.utils import get_member_id_and_share, returnMessage
+from utils.utils import (
+    get_formatted_member_share,
+    get_member_id_and_share,
+    returnMessage,
+)
 
 
 def add_expense(
@@ -67,7 +71,10 @@ def add_expense(
             (payer_id, description, listed_by, amount), new_participant_share_pair
         )
 
-        return {"error": False, "message": "Added the expense successfully."}
+        successMessage = f"""Added the expense successfully.\nExpense saved by: <@{listed_by}>\n---------------------------------\nPaid By : <@{payer_id}>\nDescription  : {description}\nTotal Amount : {amount}\nparticipants:\n{get_formatted_member_share(participant_share_pair)}
+        """
+
+        return {"error": False, "message": successMessage}
 
     except UserIdsFetchError:
         return {
@@ -104,7 +111,10 @@ def add_repayment(sender: int, receiver: int, amount: float, note: str):
         save_repayment(sender, receiver, amount, note)
 
         # return success
-        return returnMessage(False, "Saved the repayment successfully.")
+
+        successMessage = f"""Saved the repayment successfully.\n-----------------------------------\n<@{sender}> paid <@{receiver}> {amount}.\nnote: {note}\n"""
+
+        return returnMessage(False, successMessage)
 
     except UserIdsFetchError:
         return returnMessage(True, "Failed to save repayment. Couldn't access users.")

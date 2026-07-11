@@ -34,7 +34,7 @@ def handle_initialize_bot(
 
         member_name = []
         for member in members:
-            member_name.append(member[1])
+            member_name.append(f"<@{member[0]}>")
 
         return {
             "error": False,

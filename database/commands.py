@@ -8,23 +8,23 @@ create_db = f"Create database {db_name}"
 create_all_tables = """
 
 CREATE TABLE users (
-uid INT PRIMARY KEY,
+uid BIGINT PRIMARY KEY,
 name VARCHAR(100),
 added_date DATE DEFAULT CURRENT_DATE
 );
 
 CREATE TABLE expenses (
 eid SERIAL PRIMARY KEY,
-payer INT REFERENCES users(uid),
+payer BIGINT REFERENCES users(uid),
 description VARCHAR(300),
-listed_by INT REFERENCES users(uid),
+listed_by BIGINT REFERENCES users(uid),
 amount NUMERIC(10,2),
 added_date DATE DEFAULT CURRENT_DATE
 );
 
 
 CREATE TABLE expense_participants(
-uid INT REFERENCES users(uid),
+uid BIGINT REFERENCES users(uid),
 eid INT REFERENCES expenses(eid),
 share NUMERIC(10,2),
 PRIMARY KEY(eid, uid)
@@ -33,8 +33,8 @@ PRIMARY KEY(eid, uid)
 
 
 CREATE TABLE repayments(
-sender INT REFERENCES users(uid),
-receiver INT REFERENCES users(uid),
+sender BIGINT REFERENCES users(uid),
+receiver BIGINT REFERENCES users(uid),
 amount NUMERIC(10,2),
 note VARCHAR(200),
 added_date DATE DEFAULT CURRENT_DATE

@@ -12,9 +12,11 @@ from database.queries import (
     create_all_tables,
     create_db,
     delete_db,
+    get_balance_query,
     get_users,
 )
 from utils.custom_errors import (
+    BalanceFetchError,
     DatabaseCreationFailedError,
     ExpenseSaveError,
     RepaymentSaveError,
@@ -123,3 +125,18 @@ def save_repayment(sender: int, receiver: int, amount: float, note: str):
     except Exception as e:
         print(e)
         raise RepaymentSaveError from e
+
+
+def get_balance_info(member_id: int):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(get_balance_query, (member_id, member_id))
+
+                # get tuples of values as [(participant, payer, debt)]
+                response = cur.fetchall()
+                return response
+
+    except Exception as e:
+        print(e)
+        raise BalanceFetchError from e

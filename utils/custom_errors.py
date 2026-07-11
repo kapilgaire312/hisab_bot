@@ -26,3 +26,9 @@ class RepaymentSaveError(Exception):
     """Error raised when it fails to save the repayment to databse"""
 
     pass
+
+
+class BalanceFetchError(Exception):
+    """Error raised when it fails to retrieve the balance info of the member."""
+
+    pass

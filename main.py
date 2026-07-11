@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from database.handlers import delete_database
 from wrappers.add_expense_and_repayments import add_expense, add_repayment
 from wrappers.initialize_bot import handle_initialize_bot
+from wrappers.show_member_balance import show_balance
 
 load_dotenv()
 
@@ -87,7 +88,8 @@ async def repay(interaction, receiver: discord.Member, amount: float, note: str)
     name="balance", description="Shows how much debt/credit a user has.", guild=GUILD
 )
 async def balance(interaction, user: discord.Member):
-    await interaction.response.send_message("hello")
+    response = show_balance(member_id=user.id)
+    await interaction.response.send_message(f"{response['message']}")
 
 
 @tree.command(

@@ -76,3 +76,11 @@ get_users = """
     SELECT uid, name from users;
     
 """
+
+get_balance_query = """
+    Select uid as participiant, payer, sum(share) as total_debt
+    from expense_participants as p, expenses as e
+    where p.eid = e.eid 
+    and (p.uid = %s or e.payer = %s)
+    group by (participiant, payer);
+"""

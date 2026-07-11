@@ -48,22 +48,31 @@ delete_db = f"DROP DATABASE {db_name};"
 
 
 # add vaues
-add_expense = """
+add_expense_query = """
     INSERT INTO expenses(payer, description, listed_by, amount)
-    VALUES (%s,%s:,%s,%s);
+    VALUES (%s,%s,%s,%s)
+    RETURNING eid;
 """
+# the returning eid makes usre insert returns primary key (eid) which is needed to add particapnts
 
-add_participant = """
+
+add_participant_query = """
     INSERT INTO expense_participants (uid,eid,share)
     VALUES (%s,%s,%s);
 """
 
-add_user = """
+add_user_query = """
     INSERT INTO users(uid,name)
     VALUES(%s,%s);
 """
 
-add_repayment = """
+add_repayment_query = """
     INSERT INTO repayments(sender, receiver,amount, note)
     VALUES(%s,%s,%s,%s) 
+"""
+
+# fetch users
+get_users = """
+    SELECT uid, name from users;
+    
 """

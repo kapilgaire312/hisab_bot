@@ -1,9 +1,12 @@
 import os
+from email import message
 
 import discord
 from dotenv import load_dotenv
 
-from database.handlers import create_database, delete_database
+from database.handlers import delete_database
+from wrappers.add_expense_and_repayments import add_expense
+from wrappers.initialize_bot import handle_initialize_bot
 
 load_dotenv()
 
@@ -30,11 +33,8 @@ GUILD = discord.Object(id=guild_id)
     guild=GUILD,
 )
 async def initialize_bot(interaction):
-    print(interaction.guild.members)
-    create_database()
-    await interaction.response.send_message(
-        "Hisab Bot initialized successfully in this server for all members."
-    )
+    response = handle_initialize_bot(interaction=interaction)
+    await interaction.response.send_message(f"{response['message']}")
 
 
 @tree.command(
@@ -42,10 +42,9 @@ async def initialize_bot(interaction):
     description="Initialize the bot by excluding certain members.",
     guild=GUILD,
 )
-async def initialize_bot_with_exception(interaction, exclude: discord.Member):
-    await interaction.response.send_message(
-        "Hisab Bot initialized successfully in this server excluding certain members."
-    )
+async def initialize_bot_with_exception(interaction, exclude: str):
+    response = handle_initialize_bot(interaction=interaction, exception_members=exclude)
+    await interaction.response.send_message(f"{response['message']}")
 
 
 @tree.command(
@@ -62,9 +61,16 @@ async def delete_db(interaction):
 async def expense(
     interaction, payer: discord.Member, description: str, amount: int, participants: str
 ):
-    print(payer.id, description)
+    print(interaction.user.id, description)
     print(amount, participants)
-    await interaction.response.send_message("Added the transaction.")
+    response = add_expense(
+        payer_id=payer.id,
+        description=description,
+        amount=amount,
+        listed_by=interaction.user.id,
+        participants=participants,
+    )
+    await interaction.response.send_message(f"{response['message']}")
 
 
 @tree.command(name="repay", description="Log repayment info to the bot.", guild=GUILD)

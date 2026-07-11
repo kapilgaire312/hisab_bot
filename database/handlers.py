@@ -85,7 +85,7 @@ def get_all_user_ids():
 
 
 def save_expense(
-    expense_info: tuple[int, str, int, int], participant_share_list: list[dict]
+    expense_info: tuple[int, str, int, float], participant_share_list: list[dict]
 ):
     with get_connection() as conn:
         with conn.cursor() as cur:

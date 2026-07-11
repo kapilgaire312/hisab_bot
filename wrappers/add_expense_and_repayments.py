@@ -4,7 +4,7 @@ from utils.utils import get_member_id_and_share
 
 
 def add_expense(
-    payer_id: int, description: str, amount: int, listed_by: int, participants: str
+    payer_id: int, description: str, amount: float, listed_by: int, participants: str
 ):
     # get the users from db
     # check the payer and participants id to see they are in the db.

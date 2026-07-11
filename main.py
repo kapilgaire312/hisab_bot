@@ -59,7 +59,7 @@ async def delete_db(interaction):
 
 @tree.command(name="expense", description="Add new shared expense.", guild=GUILD)
 async def expense(
-    interaction, payer: discord.Member, description: str, amount: int, participants: str
+    interaction, payer: discord.Member, description: str, amount: float, participants: str
 ):
     print(interaction.user.id, description)
     print(amount, participants)
@@ -74,7 +74,7 @@ async def expense(
 
 
 @tree.command(name="repay", description="Log repayment info to the bot.", guild=GUILD)
-async def repay(interaction, receiver: discord.Member, amount: int, note: str):
+async def repay(interaction, receiver: discord.Member, amount: float, note: str):
     print(amount, note)
     await interaction.response.send_message(
         f"{interaction.user} payed {amount} to {receiver.name}."

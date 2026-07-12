@@ -4,9 +4,10 @@ from email import message
 import discord
 from dotenv import load_dotenv
 
-from database.handlers import delete_database
+from database.handlers import delete_database, get_history_all
 from wrappers.add_expense_and_repayments import add_expense, add_repayment
 from wrappers.initialize_bot import handle_initialize_bot
+from wrappers.show_history import show_history_all
 from wrappers.show_member_balance import show_balance
 
 load_dotenv()
@@ -107,7 +108,8 @@ async def history(interaction, user: discord.Member):
     guild=GUILD,
 )
 async def historyall(interaction):
-    await interaction.response.send_message("Your history")
+    respose = show_history_all()
+    await interaction.response.send_message(respose["message"])
 
 
 @tree.command(

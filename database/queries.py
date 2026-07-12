@@ -104,7 +104,7 @@ full join (
 on (part.participant= r.sender and part.payer = r.receiver); 
 """
 
-get_history_all = """
+get_history_all_query = """
     Select 'expense' as type, 
         'e' || e.eid as id,
         e.payer, e.description, e.listed_by, e.amount, e.added_date,

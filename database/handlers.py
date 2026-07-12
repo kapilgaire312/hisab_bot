@@ -13,12 +13,14 @@ from database.queries import (
     create_db,
     delete_db,
     get_balance_query,
+    get_history_all_query,
     get_users,
 )
 from utils.custom_errors import (
     BalanceFetchError,
     DatabaseCreationFailedError,
     ExpenseSaveError,
+    HistoryFetchError,
     RepaymentSaveError,
     TimestampInitializeError,
     UserIdsFetchError,
@@ -98,7 +100,7 @@ def get_all_user_ids():
                 return users_ids
     except Exception as e:
         print(e)
-        raise UserIdsFetchError from e
+        raise UserIdsFetchError() from e
 
 
 def save_expense(
@@ -125,7 +127,7 @@ def save_expense(
             except Exception as e:
                 conn.rollback()
                 print(e)
-                raise ExpenseSaveError from e
+                raise ExpenseSaveError() from e
 
 
 def save_repayment(sender: int, receiver: int, amount: float, note: str):
@@ -136,7 +138,7 @@ def save_repayment(sender: int, receiver: int, amount: float, note: str):
 
     except Exception as e:
         print(e)
-        raise RepaymentSaveError from e
+        raise RepaymentSaveError() from e
 
 
 def get_balance_info(member_id: int):
@@ -153,4 +155,19 @@ def get_balance_info(member_id: int):
 
     except Exception as e:
         print(e)
-        raise BalanceFetchError from e
+        raise BalanceFetchError() from e
+
+
+def get_history_all():
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(get_history_all_query)
+
+                # responds with a list of tuple as [(type,id, payer, description, listed_by, amount, added_date, sender, receiver, note)]
+                response = cur.fetchall()
+                return response
+
+    except Exception as e:
+        print(e)
+        raise HistoryFetchError() from e

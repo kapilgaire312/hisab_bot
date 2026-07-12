@@ -38,3 +38,9 @@ class BalanceFetchError(Exception):
     """Error raised when it fails to retrieve the balance info of the member."""
 
     pass
+
+
+class HistoryFetchError(Exception):
+    """Error raised when it fails to retrieve history of expenses and payments from db."""
+
+    pass

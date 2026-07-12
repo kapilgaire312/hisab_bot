@@ -13,6 +13,9 @@ from database.queries import (
     create_all_tables,
     create_db,
     delete_db,
+    delete_expense_query,
+    delete_participants_query,
+    delete_repayment_entry_query,
     get_balance_query,
     get_history_query,
     get_users,
@@ -20,6 +23,7 @@ from database.queries import (
 from utils.custom_errors import (
     BalanceFetchError,
     DatabaseCreationFailedError,
+    DeleteFailedError,
     ExpenseSaveError,
     HistoryFetchError,
     RepaymentSaveError,
@@ -178,3 +182,27 @@ def get_history(member_id: int = 0):
     except Exception as e:
         print(e)
         raise HistoryFetchError() from e
+
+
+def delete_expense_entry(eid: int):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute(delete_participants_query, (eid,))
+                cur.execute(delete_expense_query, (eid,))
+
+            except Exception as e:
+                conn.rollback()
+                print(e)
+                raise DeleteFailedError() from e
+
+
+def delete_repayment_entry(pid: int):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(delete_repayment_entry_query, (pid,))
+
+    except Exception as e:
+        print(e)
+        raise DeleteFailedError() from e

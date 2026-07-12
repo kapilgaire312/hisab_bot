@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from database.handlers import delete_database
 from wrappers.add_expense_and_repayments import add_expense, add_repayment
+from wrappers.delete_entries import delete_entry
 from wrappers.initialize_bot import handle_initialize_bot
 from wrappers.show_history import show_history
 from wrappers.show_member_balance import show_balance
@@ -114,11 +115,12 @@ async def historyall(interaction):
 
 @tree.command(
     name="delete",
-    description="Delete a expense using its id.",
+    description="Delete a expense or payment using its id.",
     guild=GUILD,
 )
 async def delete_expense(interaction, id: str):
-    await interaction.response.send_message("the expense was deleted successfully.")
+    response = delete_entry(id=id)
+    await interaction.response.send_message(f"{response['message']}")
 
 
 @tree.command(

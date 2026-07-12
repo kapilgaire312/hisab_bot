@@ -135,3 +135,19 @@ def get_history_query(all: bool = True):
     Order By added_date ASC;
 
     """
+
+
+delete_participants_query = """
+    DELETE From expense_participants 
+    WHERE eid = %s;
+  """
+delete_expense_query = """
+  DELETE FROM expenses
+    where eid =%s;
+
+"""
+
+delete_repayment_entry_query = """
+    DELETE From repayments
+    Where rid=%s;
+"""

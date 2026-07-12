@@ -44,3 +44,9 @@ class HistoryFetchError(Exception):
     """Error raised when it fails to retrieve history of expenses and payments from db."""
 
     pass
+
+
+class DeleteFailedError(Exception):
+    """Error raised when it fails to delte the expense or repayment in the database."""
+
+    pass

@@ -10,6 +10,12 @@ class UserTableInitializeError(Exception):
     pass
 
 
+class TimestampInitializeError(Exception):
+    """Error raised when it fails to initialize the cleard_timestamp."""
+
+    pass
+
+
 class UserIdsFetchError(Exception):
     """Error raised when it fails to fetch the users ids."""
 

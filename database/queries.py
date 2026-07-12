@@ -19,7 +19,7 @@ payer BIGINT REFERENCES users(uid),
 description VARCHAR(300),
 listed_by BIGINT REFERENCES users(uid),
 amount NUMERIC(10,2),
-added_date DATE DEFAULT CURRENT_DATE
+added_date TIMESTAMPTZ DEFAULT NOW()
 );
 
 
@@ -33,14 +33,22 @@ PRIMARY KEY(eid, uid)
 
 
 CREATE TABLE repayments(
+rid SERIAL PRIMARY KEY,
 sender BIGINT REFERENCES users(uid),
 receiver BIGINT REFERENCES users(uid),
 amount NUMERIC(10,2),
 note VARCHAR(200),
-added_date DATE DEFAULT CURRENT_DATE
+added_date TIMESTAMPTZ DEFAULT NOW()
 
 );
+
+CREATE TABLE cleared_date(
+cleared_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+)
 """
+
+# initialize cleared timesatmp
+clear_timestamp_query = "INSERT INTO cleared_date DEFAULT VALUES;"
 
 
 # delete entire database
@@ -83,4 +91,31 @@ get_balance_query = """
     where p.eid = e.eid 
     and (p.uid = %s or e.payer = %s)
     group by (participiant, payer);
+"""
+
+
+get_history_all = """
+    Select 'expense' as type, 
+        'e' || e.eid as id,
+        e.payer, e.description, e.listed_by, e.amount, e.added_date,
+        NULL::bigint as sender, NULL::bigint as receiver, NULL::text as note,
+        json_agg(
+            json_build_object(
+                'uid',p.uid,
+                'share',p.share)
+        ) as participants
+    From expenses as e
+    Join expense_participants p
+    On e.eid = p.eid
+    Group by e.eid
+
+    Union All
+
+    Select 'repayment' as type,
+        'p' || r.rid as id,
+        NULL::bigint as payer, NULL::text as description, NULL::bigint as listed_by, r.amount, r.added_date,
+        r.sender, r.receiver, r.note, NULL
+    From repayments as r
+
+    Order By added_date ASC;
 """

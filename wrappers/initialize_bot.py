@@ -5,9 +5,17 @@ import logging
 import discord
 from psycopg.errors import DuplicateDatabase
 
-from database.handlers import create_database, initialize_users_table
-from utils.custom_errors import DatabaseCreationFailedError, UserTableInitializeError
-from utils.utils import get_member_id_from_string
+from database.handlers import (
+    create_database,
+    initialize_timestamp,
+    initialize_users_table,
+)
+from utils.custom_errors import (
+    DatabaseCreationFailedError,
+    TimestampInitializeError,
+    UserTableInitializeError,
+)
+from utils.utils import get_member_id_from_string, returnMessage
 
 # instantiate logger
 logger = logging.getLogger(__name__)
@@ -31,6 +39,8 @@ def handle_initialize_bot(
             }
 
         initialize_users_table(members)
+
+        initialize_timestamp()
 
         member_name = []
         for member in members:
@@ -56,6 +66,10 @@ def handle_initialize_bot(
     except UserTableInitializeError as e:
         logger.error(e)
         return {"error": True, "message": "Failed to initialize members."}
+
+    except TimestampInitializeError as e:
+        logger.error(e)
+        return returnMessage(True, "Failed to initialize cleared_timestamp.")
 
     except Exception as e:
         logger.error(e)

@@ -1,5 +1,4 @@
 import os
-import re
 
 from dotenv import load_dotenv
 
@@ -9,6 +8,7 @@ from database.queries import (
     add_participant_query,
     add_repayment_query,
     add_user_query,
+    clear_timestamp_query,
     create_all_tables,
     create_db,
     delete_db,
@@ -20,6 +20,7 @@ from utils.custom_errors import (
     DatabaseCreationFailedError,
     ExpenseSaveError,
     RepaymentSaveError,
+    TimestampInitializeError,
     UserIdsFetchError,
     UserTableInitializeError,
 )
@@ -70,6 +71,18 @@ def initialize_users_table(
         raise UserTableInitializeError() from e
 
 
+# initialize the timestamp
+def initialize_timestamp():
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(clear_timestamp_query)
+
+    except Exception as e:
+        print(e)
+        raise TimestampInitializeError() from e
+
+
 def get_all_user_ids():
     try:
         with get_connection() as conn:
@@ -82,7 +95,6 @@ def get_all_user_ids():
                 for row in rows:
                     users_ids.append(row[0])
 
-                print(users_ids)
                 return users_ids
     except Exception as e:
         print(e)

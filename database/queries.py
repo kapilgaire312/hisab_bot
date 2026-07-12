@@ -104,7 +104,9 @@ full join (
 on (part.participant= r.sender and part.payer = r.receiver); 
 """
 
-get_history_all_query = """
+
+def get_history_query(all: bool = True):
+    return f"""
     Select 'expense' as type, 
         'e' || e.eid as id,
         e.payer, e.description, e.listed_by, e.amount, e.added_date,
@@ -117,6 +119,8 @@ get_history_all_query = """
     From expenses as e
     Join expense_participants p
     On e.eid = p.eid
+
+        {"" if all else "Where p.uid =%s  or e.payer = %s"}
     Group by e.eid
 
     Union All
@@ -126,6 +130,8 @@ get_history_all_query = """
         NULL::bigint as payer, NULL::text as description, NULL::bigint as listed_by, r.amount, r.added_date,
         r.sender, r.receiver, r.note, NULL
     From repayments as r
+        {"" if all else "Where r.receiver =%s or r.sender=%s"}
 
     Order By added_date ASC;
-"""
+
+    """

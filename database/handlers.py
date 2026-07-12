@@ -1,5 +1,6 @@
 import os
 
+from discord.abc import T
 from dotenv import load_dotenv
 
 from database.connect import get_connection
@@ -13,7 +14,7 @@ from database.queries import (
     create_db,
     delete_db,
     get_balance_query,
-    get_history_all_query,
+    get_history_query,
     get_users,
 )
 from utils.custom_errors import (
@@ -158,11 +159,17 @@ def get_balance_info(member_id: int):
         raise BalanceFetchError() from e
 
 
-def get_history_all():
+def get_history(member_id: int = 0):
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(get_history_all_query)
+                query = ""
+                if not member_id:
+                    query = get_history_query(all=True)
+                    cur.execute(query)
+                else:
+                    query = get_history_query(all=False)
+                    cur.execute(query, (member_id, member_id, member_id, member_id))
 
                 # responds with a list of tuple as [(type,id, payer, description, listed_by, amount, added_date, sender, receiver, note)]
                 response = cur.fetchall()

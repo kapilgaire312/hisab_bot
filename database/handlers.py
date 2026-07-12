@@ -143,7 +143,9 @@ def get_balance_info(member_id: int):
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(get_balance_query, (member_id, member_id))
+                cur.execute(
+                    get_balance_query, (member_id, member_id, member_id, member_id)
+                )
 
                 # get tuples of values as [(participant, payer, debt)]
                 response = cur.fetchall()

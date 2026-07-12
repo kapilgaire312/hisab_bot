@@ -86,13 +86,23 @@ get_users = """
 """
 
 get_balance_query = """
-    Select uid as participiant, payer, sum(share) as total_debt
-    from expense_participants as p, expenses as e
-    where p.eid = e.eid 
-    and (p.uid = %s or e.payer = %s)
-    group by (participiant, payer);
-"""
+select Coalesce(part.participant, r.sender) as participant, Coalesce(part.payer,r.receiver) as payer, 
+ COALESCE(part.total_share, 0) - COALESCE(r.total_repay, 0) AS debt 
+from(
+select p.uid as participant, e.payer, sum(share) as total_share
+from expense_participants as p, expenses as e 
+where p.eid = e.eid
+and (p.uid=%s or e.payer =%s)
+group by (participant, payer)) part
 
+full join (
+   select sender,receiver , sum(amount) as total_repay
+   from repayments
+   where sender = %s or receiver =%s
+   group by (sender, receiver)
+) r
+on (part.participant= r.sender and part.payer = r.receiver); 
+"""
 
 get_history_all = """
     Select 'expense' as type, 

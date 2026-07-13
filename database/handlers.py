@@ -19,6 +19,7 @@ from database.queries import (
     get_balance_query,
     get_history_query,
     get_users,
+    update_timestamp_query,
 )
 from utils.custom_errors import (
     BalanceFetchError,
@@ -212,7 +213,7 @@ def clear_timestamp():
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(clear_timestamp_query)
+                cur.execute(update_timestamp_query)
 
     except Exception as e:
         print(e)

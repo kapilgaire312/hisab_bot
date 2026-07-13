@@ -44,7 +44,7 @@ added_date TIMESTAMPTZ DEFAULT NOW()
 
 CREATE TABLE cleared_date(
 cleared_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
-)
+);
 """
 
 # initialize cleared timesatmp
@@ -85,14 +85,36 @@ get_users = """
     
 """
 
+"""
+select Coalesce(part.participant, r.sender) as participant, Coalesce(part.payer,r.receiver) as payer, 
+ COALESCE(part.total_share, 0) - COALESCE(r.total_repay, 0) AS debt 
+from(
+select p.uid as participant, e.payer, sum(share) as total_share
+from expense_participants as p, expenses as e , cleared_date as c
+where p.eid = e.eid
+and (p.uid=763067119280848907 or e.payer =763067119280848907)
+and e.added_date > c.cleared_timestamp
+group by (participant, payer)) part
+
+full join (
+   select sender,receiver , sum(amount) as total_repay
+   from repayments re, cleared_date c
+   where (re.sender = 763067119280848907 or re.receiver =763067119280848907)
+   and re.added_date > c.cleared_timestamp
+   group by (sender, receiver)
+) r
+on (part.participant= r.sender and part.payer = r.receiver); 
+"""
+
 get_balance_query = """
 select Coalesce(part.participant, r.sender) as participant, Coalesce(part.payer,r.receiver) as payer, 
  COALESCE(part.total_share, 0) - COALESCE(r.total_repay, 0) AS debt 
 from(
 select p.uid as participant, e.payer, sum(share) as total_share
-from expense_participants as p, expenses as e 
+from expense_participants as p, expenses as e , cleared_date as c
 where p.eid = e.eid
 and (p.uid=%s or e.payer =%s)
+and e.added_date > c.cleared_date
 group by (participant, payer)) part
 
 full join (
@@ -150,4 +172,9 @@ delete_expense_query = """
 delete_repayment_entry_query = """
     DELETE From repayments
     Where rid=%s;
+"""
+
+update_timestamp_query = """
+    UPDATE cleared_date
+    SET cleared_timestamp = NOW();
 """

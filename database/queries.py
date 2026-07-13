@@ -86,25 +86,11 @@ get_users = """
 """
 
 """
-select Coalesce(part.participant, r.sender) as participant, Coalesce(part.payer,r.receiver) as payer, 
- COALESCE(part.total_share, 0) - COALESCE(r.total_repay, 0) AS debt 
-from(
-select p.uid as participant, e.payer, sum(share) as total_share
-from expense_participants as p, expenses as e , cleared_date as c
-where p.eid = e.eid
-and (p.uid=763067119280848907 or e.payer =763067119280848907)
-and e.added_date > c.cleared_timestamp
-group by (participant, payer)) part
+ 
 
-full join (
-   select sender,receiver , sum(amount) as total_repay
-   from repayments re, cleared_date c
-   where (re.sender = 763067119280848907 or re.receiver =763067119280848907)
-   and re.added_date > c.cleared_timestamp
-   group by (sender, receiver)
-) r
-on (part.participant= r.sender and part.payer = r.receiver); 
+
 """
+
 
 get_balance_query = """
 select Coalesce(part.participant, r.sender) as participant, Coalesce(part.payer,r.receiver) as payer, 
@@ -113,14 +99,15 @@ from(
 select p.uid as participant, e.payer, sum(share) as total_share
 from expense_participants as p, expenses as e , cleared_date as c
 where p.eid = e.eid
-and (p.uid=%s or e.payer =%s)
-and e.added_date > c.cleared_date
+and (p.uid=%s or e.payer = %s)
+and e.added_date > c.cleared_timestamp
 group by (participant, payer)) part
 
 full join (
    select sender,receiver , sum(amount) as total_repay
-   from repayments
-   where sender = %s or receiver =%s
+   from repayments re, cleared_date c
+   where (re.sender = %s or re.receiver =%s)
+   and re.added_date > c.cleared_timestamp
    group by (sender, receiver)
 ) r
 on (part.participant= r.sender and part.payer = r.receiver); 
@@ -129,7 +116,7 @@ on (part.participant= r.sender and part.payer = r.receiver);
 
 def get_history_query(all: bool = True):
     return f"""
-    Select 'expense' as type, 
+   Select 'expense' as type, 
         'e' || e.eid as id,
         e.payer, e.description, e.listed_by, e.amount, e.added_date,
         NULL::bigint as sender, NULL::bigint as receiver, NULL::text as note,
@@ -142,7 +129,10 @@ def get_history_query(all: bool = True):
     Join expense_participants p
     On e.eid = p.eid
 
-        {"" if all else "Where p.uid =%s  or e.payer = %s"}
+    Cross Join cleared_date c 
+    Where e.added_date > c.cleared_timestamp
+    {"" if all else "And (p.uid =%s  or e.payer = %s)"}
+
     Group by e.eid
 
     Union All
@@ -152,7 +142,11 @@ def get_history_query(all: bool = True):
         NULL::bigint as payer, NULL::text as description, NULL::bigint as listed_by, r.amount, r.added_date,
         r.sender, r.receiver, r.note, NULL
     From repayments as r
-        {"" if all else "Where r.receiver =%s or r.sender=%s"}
+
+     Cross Join cleared_date c 
+    Where r.added_date > c.cleared_timestamp
+    {"" if all else "And (r.receiver =%s or r.sender=%s)"}
+
 
     Order By added_date ASC;
 

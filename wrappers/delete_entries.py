@@ -1,6 +1,10 @@
 import re
 
-from database.handlers import delete_expense_entry, delete_repayment_entry
+from database.handlers import (
+    clear_timestamp,
+    delete_expense_entry,
+    delete_repayment_entry,
+)
 from utils.custom_errors import DeleteFailedError
 from utils.utils import returnMessage
 
@@ -25,7 +29,7 @@ def delete_entry(id: str):
             delete_expense_entry(eid=int_id)
 
         elif type == "p":
-            delete_repayment_entry(rid=int_id)
+            delete_repayment_entry(pid=int_id)
 
         return returnMessage(
             False,
@@ -38,3 +42,12 @@ def delete_entry(id: str):
     except Exception as e:
         print(e)
         return returnMessage(True, "Failed to delete entry. Unexpected error occured.")
+
+
+def clear_database_records():  # updates teh timestamp to now()
+    try:
+        clear_timestamp()
+        return returnMessage(False, "The database was cleared successfully.")
+
+    except Exception:
+        return returnMessage(True, "Failed to clear the database.")

@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from database.handlers import delete_database
 from wrappers.add_expense_and_repayments import add_expense, add_repayment
-from wrappers.delete_entries import delete_entry
+from wrappers.delete_entries import clear_database_records, delete_entry
 from wrappers.initialize_bot import handle_initialize_bot
 from wrappers.show_history import show_history
 from wrappers.show_member_balance import show_balance
@@ -110,6 +110,16 @@ async def history(interaction, user: discord.Member):
 )
 async def historyall(interaction):
     respose = show_history()
+    await interaction.response.send_message(respose["message"])
+
+
+@tree.command(
+    name="clear_records",
+    description="Reset history starting from now.",
+    guild=GUILD,
+)
+async def clear_records(interaction):
+    respose = clear_database_records()
     await interaction.response.send_message(respose["message"])
 
 

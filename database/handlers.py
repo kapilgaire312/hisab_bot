@@ -206,3 +206,14 @@ def delete_repayment_entry(pid: int):
     except Exception as e:
         print(e)
         raise DeleteFailedError() from e
+
+
+def clear_timestamp():
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(clear_timestamp_query)
+
+    except Exception as e:
+        print(e)
+        raise e

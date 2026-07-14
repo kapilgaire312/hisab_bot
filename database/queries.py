@@ -153,6 +153,52 @@ def get_history_query(all: bool = True):
     """
 
 
+export_query = """
+
+Select 'expense' as type, 
+        'e' || e.eid as id,
+        pay.name as payer, e.description, list.name as listed_by, e.amount, e.added_date,
+        NULL::text as sender, NULL::text as receiver, NULL::text as note,
+        json_agg(
+            json_build_object(
+                'name',p.name,
+                'share',p.share)
+        ) as participants
+    From expenses as e
+    Join (
+    select u.name, part.share, part.eid 
+    from expense_participants part
+    Inner Join users u 
+    On u.uid = part.uid
+
+    ) p
+    On e.eid = p.eid
+
+    Inner Join users pay
+    On pay.uid = e.payer
+    Inner Join users list
+    On list.uid = e.listed_by
+
+    Group By e.eid,
+    pay.name,
+    list.name,
+    e.description,
+    e.amount,
+    e.added_date   
+
+Union all
+
+ Select 'repayment' as type,
+        'p' || r.rid as id,
+        NULL::text as payer, NULL::text as description, NULL::text as listed_by, r.amount, r.added_date,
+     s.name as sender, rec.name as receiver, r.note, NULL
+    from repayments r
+inner join users s on
+r.sender = s.uid
+inner join users rec 
+on r.receiver = rec.uid;
+"""
+
 delete_participants_query = """
     DELETE From expense_participants 
     WHERE eid = %s;

@@ -2,6 +2,7 @@ import os
 
 from discord.abc import T
 from dotenv import load_dotenv
+from psycopg.rows import dict_row
 
 from database.connect import get_connection
 from database.queries import (
@@ -16,6 +17,7 @@ from database.queries import (
     delete_expense_query,
     delete_participants_query,
     delete_repayment_entry_query,
+    export_query,
     get_balance_query,
     get_history_query,
     get_users,
@@ -214,6 +216,20 @@ def clear_timestamp():
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(update_timestamp_query)
+
+    except Exception as e:
+        print(e)
+        raise e
+
+
+def get_export_data():
+    try:
+        with get_connection() as conn:
+            with conn.cursor(row_factory=dict_row) as cur:
+                cur.execute(export_query)
+
+                response = cur.fetchall()
+                return response
 
     except Exception as e:
         print(e)

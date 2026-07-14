@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from database.handlers import delete_database
 from wrappers.add_expense_and_repayments import add_expense, add_repayment
 from wrappers.delete_entries import clear_database_records, delete_entry
+from wrappers.export_transactions import export_all_transactions
 from wrappers.initialize_bot import handle_initialize_bot
 from wrappers.show_history import show_history
 from wrappers.show_member_balance import show_balance
@@ -139,7 +140,19 @@ async def delete_expense(interaction, id: str):
     guild=GUILD,
 )
 async def export(interaction):
-    await interaction.response.send_message("Your file will be exported.")
+    #discord expects the response of a commad within 3 seconds. so heavy db searching will throw error 10062
+    #so we need to use response.defer immediately which buys the bot 15 mins and shows thinking.. in user side.
+
+    await interaction.response.defer(ephemeral=False) #the ephemeral means all usrs can see the thinking...
+    
+    try:
+
+        response = export_all_transactions()
+        await interaction.followup.send(response["message"]) # we use followup to send multipel response to a slash command.
+
+    except Exception as e:
+        print(e)
+        await interaction.followup.send("An error occured.", ephemeral= True) #only the person requesting expost can see the error message.
 
 
 @client.event

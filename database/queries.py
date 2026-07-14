@@ -196,7 +196,8 @@ Union all
 inner join users s on
 r.sender = s.uid
 inner join users rec 
-on r.receiver = rec.uid;
+on r.receiver = rec.uid
+    Order By added_date ASC;
 """
 
 delete_participants_query = """

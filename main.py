@@ -1,4 +1,5 @@
 import os
+from fileinput import filename
 
 import discord
 from dotenv import load_dotenv
@@ -135,24 +136,41 @@ async def delete_expense(interaction, id: str):
 
 
 @tree.command(
-    name="export",
+    name="export_transactions",
     description="Export all data since initialization as csv.",
     guild=GUILD,
 )
 async def export(interaction):
-    #discord expects the response of a commad within 3 seconds. so heavy db searching will throw error 10062
-    #so we need to use response.defer immediately which buys the bot 15 mins and shows thinking.. in user side.
+    # discord expects the response of a commad within 3 seconds. so heavy db searching will throw error 10062
+    # so we need to use response.defer immediately which buys the bot 15 mins and shows thinking.. in user side.
 
-    await interaction.response.defer(ephemeral=False) #the ephemeral means all usrs can see the thinking...
-    
+    await interaction.response.defer(
+        ephemeral=False
+    )  # the ephemeral means all usrs can see the thinking...
+
     try:
-
         response = export_all_transactions()
-        await interaction.followup.send(response["message"]) # we use followup to send multipel response to a slash command.
+        if isinstance(response, dict):
+            await interaction.followup.send(
+                response["message"]
+            )  # we use followup to send multipel response to a slash command.
+
+        else:
+            discord_file = discord.File(
+                fp=response, filename="hisab_bot_transactions_report.csv"
+            )
+            await interaction.followup.send(
+                content="Here is the transactions report.", file=discord_file
+            )
+
+            # closing the buffer to free memory
+            response.close()
 
     except Exception as e:
         print(e)
-        await interaction.followup.send("An error occured.", ephemeral= True) #only the person requesting expost can see the error message.
+        await interaction.followup.send(
+            "An error occured.", ephemeral=True
+        )  # only the person requesting expost can see the error message.
 
 
 @client.event

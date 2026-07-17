@@ -2,11 +2,30 @@ import re
 
 from database.handlers import (
     clear_timestamp,
+    delete_database,
     delete_expense_entry,
     delete_repayment_entry,
 )
 from utils.custom_errors import DeleteFailedError
-from utils.utils import returnMessage
+from utils.utils import check_admin_or_mod, returnMessage
+
+
+def delete_enitre_db(interaction):
+    is_mod = check_admin_or_mod(interaction)
+
+    if not is_mod:
+        return returnMessage(
+            True, "Only an admin or a moderator can delete the database."
+        )
+
+    try:
+        delete_database()
+        return returnMessage(False, "The entire database was deleted successfully.")
+
+    except Exception as e:
+        print(e)
+
+        return returnMessage(True, "Failed to delete the database.")
 
 
 def delete_entry(id: str):

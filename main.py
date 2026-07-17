@@ -1,12 +1,14 @@
 import os
-from fileinput import filename
 
 import discord
 from dotenv import load_dotenv
 
-from database.handlers import delete_database
 from wrappers.add_expense_and_repayments import add_expense, add_repayment
-from wrappers.delete_entries import clear_database_records, delete_entry
+from wrappers.delete_entries import (
+    clear_database_records,
+    delete_enitre_db,
+    delete_entry,
+)
 from wrappers.export_transactions import export_all_transactions
 from wrappers.initialize_bot import handle_initialize_bot
 from wrappers.show_history import show_history
@@ -57,8 +59,8 @@ async def initialize_bot_with_exception(interaction, exclude: str):
     guild=GUILD,
 )
 async def delete_db(interaction):
-    delete_database()
-    await interaction.response.send_message("Entire database deleted successfully.")
+    response = delete_enitre_db(interaction)
+    await interaction.response.send_message(response["message"])
 
 
 @tree.command(name="expense", description="Add new shared expense.", guild=GUILD)
@@ -169,7 +171,7 @@ async def export(interaction):
     except Exception as e:
         print(e)
         await interaction.followup.send(
-            "An error occured.", ephemeral=True
+            "An error occured while fetching the transactions report.", ephemeral=True
         )  # only the person requesting expost can see the error message.
 
 

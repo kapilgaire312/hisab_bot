@@ -1,5 +1,4 @@
 import os
-from shlex import join
 
 import psycopg
 from dotenv import load_dotenv
@@ -7,7 +6,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-DB_URL = os.getenv("DB_CONNECTION_STRING_LOCAL")
+DB_URL = os.getenv("DB_CONNECTION_STRING")
+
+print(DB_URL)
 
 
 def get_connection(db_name=None):
@@ -16,4 +17,6 @@ def get_connection(db_name=None):
         url = "/".join(db_removed_list) + "/" + db_name
         print(url)
         return psycopg.connect(url)
+
+    #  return conn
     return psycopg.connect(DB_URL)

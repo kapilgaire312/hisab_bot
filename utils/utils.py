@@ -1,5 +1,7 @@
 import re
 
+from discord.permissions import permission_alias
+
 
 def returnMessage(error: bool, message: str):
     return {"error": error, "message": message}
@@ -45,7 +47,6 @@ def get_member_id_and_share(values_string: str):
 
         except ValueError:
             pass
-    print(id_share_pair)
     return (id_share_pair, participant_ids)
 
 
@@ -55,3 +56,12 @@ def get_formatted_member_share(participants):
         result += f"<@{participant.get('id')}> : {participant.get('share')} \n"
 
     return result
+
+
+def check_admin_or_mod(interaction):
+    permissions = interaction.guild_permissions
+
+    if permissions.administrator or permissions.manage_messages:
+        return True
+
+    return False

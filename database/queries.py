@@ -100,14 +100,14 @@ select p.uid as participant, e.payer, sum(share) as total_share
 from expense_participants as p, expenses as e , cleared_date as c
 where p.eid = e.eid
 and (p.uid=%s or e.payer = %s)
-and e.added_date > c.cleared_timestamp
+and e.added_date > (Select MAX(cleared_timestamp) From cleared_date)
 group by (participant, payer)) part
 
 full join (
    select sender,receiver , sum(amount) as total_repay
    from repayments re, cleared_date c
    where (re.sender = %s or re.receiver =%s)
-   and re.added_date > c.cleared_timestamp
+   and re.added_date > (Select MAX(cleared_timestamp) From cleared_date)
    group by (sender, receiver)
 ) r
 on (part.participant= r.sender and part.payer = r.receiver); 
@@ -130,7 +130,7 @@ def get_history_query(all: bool = True):
     On e.eid = p.eid
 
     Cross Join cleared_date c 
-    Where e.added_date > c.cleared_timestamp
+    Where e.added_date > (Select MAX(cleared_timestamp) From cleared_date)
     {"" if all else "And (p.uid =%s  or e.payer = %s)"}
 
     Group by e.eid
@@ -144,7 +144,7 @@ def get_history_query(all: bool = True):
     From repayments as r
 
      Cross Join cleared_date c 
-    Where r.added_date > c.cleared_timestamp
+    Where r.added_date > (Select MAX(cleared_timestamp) From cleared_date)
     {"" if all else "And (r.receiver =%s or r.sender=%s)"}
 
 
@@ -169,9 +169,10 @@ delete_repayment_entry_query = """
 """
 
 update_timestamp_query = """
-    UPDATE cleared_date
-    SET cleared_timestamp = NOW();
+    INSERT INTO cleared_date (cleared_timestamp)
+    VALUES (NOW());
 """
+
 export_query = """
 Select 'expense' as type, 
         'e' || e.eid as id,

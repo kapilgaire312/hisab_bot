@@ -232,51 +232,5 @@ async def on_ready():
     print(f"ready: {client.user}")
 
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-
-    if message.reference is not None:  # if the message is a reply
-        return
-
-    if message.mention_everyone:
-        return
-
-    if client.user not in message.mentions:
-        return
-
-    print(message.content)
-    first_word = message.content.split(maxsplit=1)[0]
-    application_id = "<@" + str(client.application_id) + ">"
-
-    try:
-        if first_word == application_id:
-            print("true")
-            split_words = message.content.split(maxsplit=2)
-            print(split_words)
-
-            match split_words[1]:
-                case "--help":
-                    await message.channel.send("So you need help, huh?")
-
-                case "--format":
-                    await message.channel.send("format of what, huh?")
-
-                case _:
-                    raise ValueError("Choose a valid option")
-
-        else:
-            raise ValueError("Choose a valid option")
-    except ValueError:
-        await message.channel.send(
-            "Enter a valid command. Use '@HisabBot --help' for help."
-        )
-
-    except Exception as e:
-        print(e)
-        await message.channel.send("Failed to make changes, erorr occures.")
-
-
 token = os.getenv("BOT_TOKEN")
 client.run(token)

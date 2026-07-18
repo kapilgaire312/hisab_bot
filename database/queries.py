@@ -48,11 +48,6 @@ cleared_by BIGINT REFERENCES users(uid)
 );
 """
 
-# initialize cleared timesatmp
-clear_timestamp_query = (
-    "INSERT INTO cleared_date(cleared_timestamp, cleared_by) VALUES (NOW(),%s);"
-)
-
 
 # delete entire database
 delete_db = f"DROP DATABASE {db_name};"
@@ -172,7 +167,7 @@ delete_repayment_entry_query = """
 """
 
 update_timestamp_query = """
-    "INSERT INTO cleared_date(cleared_timestamp, cleared_by) VALUES (NOW(),%s);"
+    INSERT INTO cleared_date(cleared_timestamp, cleared_by) VALUES (NOW(),%s);
 """
 
 export_query = """

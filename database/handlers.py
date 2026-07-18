@@ -1,6 +1,5 @@
 import os
 
-from discord.abc import T
 from dotenv import load_dotenv
 from psycopg.rows import dict_row
 
@@ -10,7 +9,6 @@ from database.queries import (
     add_participant_query,
     add_repayment_query,
     add_user_query,
-    clear_timestamp_query,
     create_all_tables,
     create_db,
     delete_db,
@@ -30,7 +28,6 @@ from utils.custom_errors import (
     ExpenseSaveError,
     HistoryFetchError,
     RepaymentSaveError,
-    TimestampInitializeError,
     UserIdsFetchError,
     UserTableInitializeError,
 )
@@ -79,18 +76,6 @@ def initialize_users_table(
 
     except Exception as e:
         raise UserTableInitializeError() from e
-
-
-# initialize the timestamp
-def initialize_timestamp(initialized_by):
-    try:
-        with get_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(clear_timestamp_query, (initialized_by,))
-
-    except Exception as e:
-        print(e)
-        raise TimestampInitializeError() from e
 
 
 def get_all_user_ids():

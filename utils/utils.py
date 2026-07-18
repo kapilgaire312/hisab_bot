@@ -59,7 +59,7 @@ def get_formatted_member_share(participants):
 
 
 def check_admin_or_mod(interaction):
-    permissions = interaction.guild_permissions
+    permissions = interaction.permissions
 
     if permissions.administrator or permissions.manage_messages:
         return True

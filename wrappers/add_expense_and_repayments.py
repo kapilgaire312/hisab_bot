@@ -92,6 +92,9 @@ def add_expense(
 
 
 def add_repayment(sender: int, receiver: int, amount: float, note: str):
+    # check if sender and receiver are same;
+    if sender == receiver:
+        return returnMessage(True, "You cannot repay yourself.")
     # check if the sender and receiver are valid members.
     if amount < 0:
         return returnMessage(True, message="Amount can't be negative")

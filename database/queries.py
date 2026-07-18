@@ -153,8 +153,26 @@ def get_history_query(all: bool = True):
     """
 
 
-export_query = """
+delete_participants_query = """
+    DELETE From expense_participants 
+    WHERE eid = %s;
+  """
+delete_expense_query = """
+  DELETE FROM expenses
+    where eid =%s;
 
+"""
+
+delete_repayment_entry_query = """
+    DELETE From repayments
+    Where rid=%s;
+"""
+
+update_timestamp_query = """
+    UPDATE cleared_date
+    SET cleared_timestamp = NOW();
+"""
+export_query = """
 Select 'expense' as type, 
         'e' || e.eid as id,
         pay.name as payer, e.description, list.name as listed_by, e.amount, e.added_date,
@@ -197,25 +215,9 @@ inner join users s on
 r.sender = s.uid
 inner join users rec 
 on r.receiver = rec.uid
+Union all
+ select 'cleared_date' as type,'#' as id,NULL,NULL,NULL,NULL,cleared_timestamp as added_date,NULL,NULL,NULL,NULL
+ from cleared_date
+ 
     Order By added_date ASC;
-"""
-
-delete_participants_query = """
-    DELETE From expense_participants 
-    WHERE eid = %s;
-  """
-delete_expense_query = """
-  DELETE FROM expenses
-    where eid =%s;
-
-"""
-
-delete_repayment_entry_query = """
-    DELETE From repayments
-    Where rid=%s;
-"""
-
-update_timestamp_query = """
-    UPDATE cleared_date
-    SET cleared_timestamp = NOW();
 """

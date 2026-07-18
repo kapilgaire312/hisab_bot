@@ -5,6 +5,7 @@ from typing import Any
 import discord
 from dotenv import load_dotenv
 
+from utils.utils import HELP_MESSAGE
 from wrappers.add_expense_and_repayments import add_expense, add_repayment
 from wrappers.delete_entries import (
     clear_database_records,
@@ -52,6 +53,16 @@ def add_defer_decorator(func):
             )
 
     return inner
+
+
+@tree.command(
+    name="help",
+    description="Show all available commands and their formats.",
+    guild=GUILD,
+)
+@add_defer_decorator
+async def help(interaction):
+    await interaction.followup.send(HELP_MESSAGE)
 
 
 @tree.command(

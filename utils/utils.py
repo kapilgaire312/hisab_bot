@@ -65,3 +65,31 @@ def check_admin_or_mod(interaction):
         return True
 
     return False
+
+
+HELP_MESSAGE = """
+# 📖 Hisab Bot Commands
+
+### 💰 Expenses
+• `/expense` - Add a shared expense.
+  Format: `payer:@user description:<text> amount:<amount> participants:@userA:share,@userB:share,...`
+
+• `/repay` - Record a repayment.
+  Format: `receiver:@user amount:<amount> note:<text>`
+
+• `/delete` - Delete a transaction by ID.
+
+### 📊 Reports
+• `/balance` - View a user's balance.
+• `/history` - View a user's transaction history.
+• `/history_all` - View all transactions.
+• `/export_transactions` - Export all transactions as CSV.
+
+### 🛠️ Admin
+• `/initiliaze_bot` - Initialize the bot.
+• `/initiliaze_bot_with_exception` - Initialize while excluding members.
+• `/clear_records` - Reset transaction history.
+• `/delete_database` ⚠️ - Permanently delete all data. Export a copy before running this.
+
+💡 Type `/` in Discord to view each command's description and parameter hints.
+"""

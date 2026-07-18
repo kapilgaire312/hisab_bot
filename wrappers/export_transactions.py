@@ -60,6 +60,15 @@ def format_records(records):
 
             clean_record["Participants / Receiver"] = record.get("receiver")
 
+        elif record.get("type") == "cleared_date":
+            clean_record["Paid By / Sender"] = "--"
+            clean_record["Description"] = "--"
+
+            clean_record["Listed By"] = record.get("listed_by")
+
+            clean_record["Participants / Receiver"] = "--"
+            clean_record["Amount"] = "--"
+
         formatted_records.append(clean_record)
 
     return formatted_records

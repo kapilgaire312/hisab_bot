@@ -214,8 +214,10 @@ r.sender = s.uid
 inner join users rec 
 on r.receiver = rec.uid
 Union all
- select 'cleared_date' as type,'#' as id,NULL,NULL,NULL,NULL,cleared_timestamp as added_date,NULL,NULL,NULL,NULL
- from cleared_date
+ select 'cleared_date' as type,'#' as id,NULL,NULL,u.name as listed_by,NULL,cleared_timestamp as added_date,NULL,NULL,NULL,NULL
+ from cleared_date c
+ inner join users u
+ On u.uid = c.cleared_by
  
     Order By added_date ASC;
 """

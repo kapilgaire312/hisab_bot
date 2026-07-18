@@ -55,18 +55,18 @@ def add_defer_decorator(func):
 
 
 @tree.command(
-    name="initiliazebot",
+    name="initiliaze_bot",
     description="Initialize the bot with all the members in the server.",
     guild=GUILD,
 )
 @add_defer_decorator
 async def initialize_bot(interaction):
     response = handle_initialize_bot(interaction=interaction)
-    await interaction.followup.send(response["message"])
+    await interaction.followup.send(response["message"], ephemeral=response["error"])
 
 
 @tree.command(
-    name="initiliazebotwithexception",
+    name="initiliaze_bot_with_exception",
     description="Initialize the bot by excluding certain members.",
     guild=GUILD,
 )
@@ -77,7 +77,7 @@ async def initialize_bot_with_exception(interaction, exclude: str):
 
 
 @tree.command(
-    name="deletedb",
+    name="delete_database",
     description="!!!!Delete the entire database. This cant be undone. Export a copy first.",
     guild=GUILD,
 )
@@ -136,7 +136,7 @@ async def history(interaction, user: discord.Member):
 
 
 @tree.command(
-    name="historyall",
+    name="history_all",
     description="Shows all transactions from last cleared date.",
     guild=GUILD,
 )

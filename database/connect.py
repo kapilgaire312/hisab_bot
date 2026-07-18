@@ -18,5 +18,4 @@ def get_connection(db_name=None):
         print(url)
         return psycopg.connect(url)
 
-    #  return conn
     return psycopg.connect(DB_URL)

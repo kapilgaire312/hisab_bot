@@ -1,4 +1,6 @@
+import functools
 import os
+from typing import Any
 
 import discord
 from dotenv import load_dotenv
@@ -33,14 +35,34 @@ guild_id = os.getenv("GUILD_ID")
 GUILD = discord.Object(id=guild_id)
 
 
+def add_defer_decorator(func):
+    @functools.wraps(func)
+    async def inner(*args: Any, **kwargs: Any):
+        print(args)
+        print(type(args[0]))
+        interaction = args[0]
+        await interaction.response.defer(ephemeral=False)
+        try:
+            print("calling function")
+            await func(*args, **kwargs)
+        except Exception as e:
+            print(e)
+            await interaction.followup.send(
+                "Unexpected error occured when processing the request.", ephemeral=True
+            )
+
+    return inner
+
+
 @tree.command(
     name="initiliazebot",
     description="Initialize the bot with all the members in the server.",
     guild=GUILD,
 )
+@add_defer_decorator
 async def initialize_bot(interaction):
     response = handle_initialize_bot(interaction=interaction)
-    await interaction.response.send_message(f"{response['message']}")
+    await interaction.followup.send(response["message"])
 
 
 @tree.command(
@@ -48,9 +70,10 @@ async def initialize_bot(interaction):
     description="Initialize the bot by excluding certain members.",
     guild=GUILD,
 )
+@add_defer_decorator
 async def initialize_bot_with_exception(interaction, exclude: str):
     response = handle_initialize_bot(interaction=interaction, exception_members=exclude)
-    await interaction.response.send_message(f"{response['message']}")
+    await interaction.followup.send(f"{response['message']}")
 
 
 @tree.command(
@@ -58,12 +81,14 @@ async def initialize_bot_with_exception(interaction, exclude: str):
     description="!!!!Delete the entire database. This cant be undone. Export a copy first.",
     guild=GUILD,
 )
+@add_defer_decorator
 async def delete_db(interaction):
     response = delete_enitre_db(interaction)
-    await interaction.response.send_message(response["message"])
+    await interaction.followup.send(response["message"])
 
 
 @tree.command(name="expense", description="Add new shared expense.", guild=GUILD)
+@add_defer_decorator
 async def expense(
     interaction,
     payer: discord.Member,
@@ -80,21 +105,23 @@ async def expense(
         listed_by=interaction.user.id,
         participants=participants,
     )
-    await interaction.response.send_message(f"{response['message']}")
+    await interaction.followup.send(f"{response['message']}")
 
 
 @tree.command(name="repay", description="Log repayment info to the bot.", guild=GUILD)
+@add_defer_decorator
 async def repay(interaction, receiver: discord.Member, amount: float, note: str):
     response = add_repayment(interaction.user.id, receiver.id, amount, note)
-    await interaction.response.send_message(f"{response['message']}")
+    await interaction.followup.send(f"{response['message']}")
 
 
 @tree.command(
     name="balance", description="Shows how much debt/credit a user has.", guild=GUILD
 )
+@add_defer_decorator
 async def balance(interaction, user: discord.Member):
     response = show_balance(member_id=user.id)
-    await interaction.response.send_message(f"{response['message']}")
+    await interaction.followup.send(f"{response['message']}")
 
 
 @tree.command(
@@ -102,9 +129,10 @@ async def balance(interaction, user: discord.Member):
     description="Shows all user transactions from last cleared date.",
     guild=GUILD,
 )
+@add_defer_decorator
 async def history(interaction, user: discord.Member):
     response = show_history(member_id=user.id)
-    await interaction.response.send_message(f"{response['message']}")
+    await interaction.followup.send(f"{response['message']}")
 
 
 @tree.command(
@@ -112,9 +140,10 @@ async def history(interaction, user: discord.Member):
     description="Shows all transactions from last cleared date.",
     guild=GUILD,
 )
+@add_defer_decorator
 async def historyall(interaction):
     respose = show_history()
-    await interaction.response.send_message(respose["message"])
+    await interaction.followup.send(respose["message"])
 
 
 @tree.command(
@@ -122,9 +151,10 @@ async def historyall(interaction):
     description="Reset history starting from now.",
     guild=GUILD,
 )
+@add_defer_decorator
 async def clear_records(interaction):
     respose = clear_database_records()
-    await interaction.response.send_message(respose["message"])
+    await interaction.followup.send(respose["message"])
 
 
 @tree.command(
@@ -132,9 +162,10 @@ async def clear_records(interaction):
     description="Delete a expense or payment using its id.",
     guild=GUILD,
 )
+@add_defer_decorator
 async def delete_expense(interaction, id: str):
     response = delete_entry(id=id)
-    await interaction.response.send_message(f"{response['message']}")
+    await interaction.followup.send(f"{response['message']}")
 
 
 @tree.command(

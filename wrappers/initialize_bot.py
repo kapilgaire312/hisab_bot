@@ -24,12 +24,13 @@ logger = logging.getLogger(__name__)
 def handle_initialize_bot(
     interaction: discord.Interaction, exception_members: str = ""
 ):
-
-    #check if the user is admin or mod to initialize the bot.
+    # check if the user is admin or mod to initialize the bot.
     is_mod = check_admin_or_mod(interaction)
 
     if not is_mod:
-      return  returnMessage(False, "Only a Moderator or an Admin can initialize the bot.")
+        return returnMessage(
+            False, "Only a Moderator or an Admin can initialize the bot."
+        )
     # first create database and table:
     try:
         create_database()

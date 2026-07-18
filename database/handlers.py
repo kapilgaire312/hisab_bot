@@ -107,7 +107,7 @@ def get_all_user_ids():
 
                 return users_ids
     except Exception as e:
-        print(e)
+        print("error occured", e)
         raise UserIdsFetchError() from e
 
 

@@ -6,8 +6,8 @@ import discord
 from psycopg.errors import DuplicateDatabase
 
 from database.handlers import (
+    clear_timestamp,
     create_database,
-    initialize_timestamp,
     initialize_users_table,
 )
 from utils.custom_errors import (
@@ -47,7 +47,8 @@ def handle_initialize_bot(
 
         initialize_users_table(members)
 
-        initialize_timestamp()
+        print(interaction.user.id)
+        clear_timestamp(initialized_by=interaction.user.id)
 
         member_name = []
         for member in members:

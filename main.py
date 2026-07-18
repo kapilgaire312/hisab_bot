@@ -39,8 +39,6 @@ GUILD = discord.Object(id=guild_id)
 def add_defer_decorator(func):
     @functools.wraps(func)
     async def inner(*args: Any, **kwargs: Any):
-        print(args)
-        print(type(args[0]))
         interaction = args[0]
         await interaction.response.defer(ephemeral=False)
         try:
@@ -164,7 +162,7 @@ async def historyall(interaction):
 )
 @add_defer_decorator
 async def clear_records(interaction):
-    respose = clear_database_records()
+    respose = clear_database_records(user_id=interaction.user.id)
     await interaction.followup.send(respose["message"])
 
 
@@ -175,7 +173,7 @@ async def clear_records(interaction):
 )
 @add_defer_decorator
 async def delete_expense(interaction, id: str):
-    response = delete_entry(id=id)
+    response = delete_entry(id=id, user_id=interaction.user.id)
     await interaction.followup.send(f"{response['message']}")
 
 

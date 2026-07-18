@@ -2,6 +2,8 @@ import re
 
 from discord.permissions import permission_alias
 
+from database.handlers import get_all_user_ids
+
 
 def returnMessage(error: bool, message: str):
     return {"error": error, "message": message}
@@ -65,6 +67,14 @@ def check_admin_or_mod(interaction):
         return True
 
     return False
+
+
+def check_user_initialized(user_id):
+    user_ids = get_all_user_ids()
+    if user_id in user_ids:
+        return True
+    else:
+        return False
 
 
 HELP_MESSAGE = """

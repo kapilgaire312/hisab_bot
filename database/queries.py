@@ -43,12 +43,15 @@ added_date TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE cleared_date(
-cleared_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+cleared_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+cleared_by BIGINT REFERENCES users(uid)
 );
 """
 
 # initialize cleared timesatmp
-clear_timestamp_query = "INSERT INTO cleared_date DEFAULT VALUES;"
+clear_timestamp_query = (
+    "INSERT INTO cleared_date(cleared_timestamp, cleared_by) VALUES (NOW(),%s);"
+)
 
 
 # delete entire database
@@ -169,8 +172,7 @@ delete_repayment_entry_query = """
 """
 
 update_timestamp_query = """
-    INSERT INTO cleared_date (cleared_timestamp)
-    VALUES (NOW());
+    "INSERT INTO cleared_date(cleared_timestamp, cleared_by) VALUES (NOW(),%s);"
 """
 
 export_query = """

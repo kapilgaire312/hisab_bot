@@ -7,7 +7,7 @@ from database.handlers import (
     delete_repayment_entry,
 )
 from utils.custom_errors import DeleteFailedError
-from utils.utils import check_admin_or_mod, returnMessage
+from utils.utils import check_admin_or_mod, check_user_initialized, returnMessage
 
 
 def delete_enitre_db(interaction):
@@ -28,8 +28,13 @@ def delete_enitre_db(interaction):
         return returnMessage(True, "Failed to delete the database.")
 
 
-def delete_entry(id: str):
+def delete_entry(id: str, user_id):
     try:
+        is_initialized = check_user_initialized(user_id=user_id)
+
+        if not is_initialized:
+            return returnMessage(True, "Failed to clear database. Not allowed!")
+
         clean_id = id.strip()
 
         if clean_id.startswith("#"):
@@ -63,9 +68,13 @@ def delete_entry(id: str):
         return returnMessage(True, "Failed to delete entry. Unexpected error occured.")
 
 
-def clear_database_records():  # updates teh timestamp to now()
+def clear_database_records(user_id):  # updates teh timestamp to now()
     try:
-        clear_timestamp()
+        is_initialized = check_user_initialized(user_id=user_id)
+
+        if not is_initialized:
+            return returnMessage(True, "Failed to clear database. Not allowed!")
+        clear_timestamp(initialized_by=user_id)
         return returnMessage(False, "The database was cleared successfully.")
 
     except Exception:

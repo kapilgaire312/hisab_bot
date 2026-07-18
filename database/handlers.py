@@ -82,11 +82,11 @@ def initialize_users_table(
 
 
 # initialize the timestamp
-def initialize_timestamp():
+def initialize_timestamp(initialized_by):
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(clear_timestamp_query)
+                cur.execute(clear_timestamp_query, (initialized_by,))
 
     except Exception as e:
         print(e)
@@ -211,11 +211,11 @@ def delete_repayment_entry(pid: int):
         raise DeleteFailedError() from e
 
 
-def clear_timestamp():
+def clear_timestamp(initialized_by: int):
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(update_timestamp_query)
+                cur.execute(update_timestamp_query, (initialized_by,))
 
     except Exception as e:
         print(e)

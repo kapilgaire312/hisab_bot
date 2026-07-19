@@ -95,7 +95,7 @@ select Coalesce(part.participant, r.sender) as participant, Coalesce(part.payer,
  COALESCE(part.total_share, 0) - COALESCE(r.total_repay, 0) AS debt 
 from(
 select p.uid as participant, e.payer, sum(share) as total_share
-from expense_participants as p, expenses as e , cleared_date as c
+from expense_participants as p, expenses as e 
 where p.eid = e.eid
 and (p.uid=%s or e.payer = %s)
 and e.added_date > (Select MAX(cleared_timestamp) From cleared_date)
@@ -103,7 +103,7 @@ group by (participant, payer)) part
 
 full join (
    select sender,receiver , sum(amount) as total_repay
-   from repayments re, cleared_date c
+   from repayments re
    where (re.sender = %s or re.receiver =%s)
    and re.added_date > (Select MAX(cleared_timestamp) From cleared_date)
    group by (sender, receiver)
@@ -127,7 +127,6 @@ def get_history_query(all: bool = True):
     Join expense_participants p
     On e.eid = p.eid
 
-    Cross Join cleared_date c 
     Where e.added_date > (Select MAX(cleared_timestamp) From cleared_date)
     {"" if all else "And (p.uid =%s  or e.payer = %s)"}
 
@@ -141,7 +140,6 @@ def get_history_query(all: bool = True):
         r.sender, r.receiver, r.note, NULL
     From repayments as r
 
-     Cross Join cleared_date c 
     Where r.added_date > (Select MAX(cleared_timestamp) From cleared_date)
     {"" if all else "And (r.receiver =%s or r.sender=%s)"}
 

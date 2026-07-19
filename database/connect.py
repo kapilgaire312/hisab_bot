@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-DB_URL = os.getenv("DB_CONNECTION_STRING")
+DB_URL = os.getenv("DB_CONNECTION_STRING_LOCAL")
 
 print(DB_URL)
 

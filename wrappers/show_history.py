@@ -7,6 +7,7 @@ def show_history(member_id: int = 0):
     try:
         # responds with a list of tuple as [(type,id, payer, description, listed_by, amount, added_date, sender, receiver, note, participants)]
         rows = get_history(member_id=member_id)
+        print(rows)
 
         formatted_msg = format_return_message(rows, member_id)
         return returnMessage(False, formatted_msg)

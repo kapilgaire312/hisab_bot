@@ -13,6 +13,7 @@ from wrappers.delete_entries import (
     delete_entry,
 )
 from wrappers.export_transactions import export_all_transactions
+from wrappers.get_members_list import get_all_users_list
 from wrappers.initialize_bot import handle_initialize_bot
 from wrappers.show_history import show_history
 from wrappers.show_member_balance import show_balance
@@ -93,6 +94,17 @@ async def initialize_bot_with_exception(interaction, exclude: str):
 @add_defer_decorator
 async def delete_db(interaction):
     response = delete_enitre_db(interaction)
+    await interaction.followup.send(response["message"])
+
+
+@tree.command(
+    name="members_list",
+    description="Get the members list when bot was initialized.",
+    guild=GUILD,
+)
+@add_defer_decorator
+async def members_list(interaction):
+    response = get_all_users_list()
     await interaction.followup.send(response["message"])
 
 

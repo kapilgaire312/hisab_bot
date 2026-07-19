@@ -16,6 +16,7 @@ from database.queries import (
     delete_participants_query,
     delete_repayment_entry_query,
     export_query,
+    get_all_users_query,
     get_balance_query,
     get_history_query,
     get_listed_by_query,
@@ -244,6 +245,18 @@ def get_sender_id(rid):
                 sender_id = cur.fetchone()
                 return sender_id[0]
 
+            except Exception as e:
+                print(e)
+                raise e
+
+
+def get_all_users():
+    with get_connection() as conn:
+        with conn.cursor(row_factory=dict_row) as cur:
+            try:
+                cur.execute(get_all_users_query)
+                users = cur.fetchall()
+                return users
             except Exception as e:
                 print(e)
                 raise e

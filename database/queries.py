@@ -233,3 +233,8 @@ Select sender
 from repayments
 where rid = %s;
 """
+
+get_all_users_query = """
+Select uid,name
+From users;
+"""

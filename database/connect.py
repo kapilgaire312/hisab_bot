@@ -8,8 +8,6 @@ load_dotenv()
 
 DB_URL = os.getenv("DB_CONNECTION_STRING")
 
-print(DB_URL)
-
 
 def get_connection(db_name=None):
     if db_name:  # when there is not database, so we default to postgres database that it creates.

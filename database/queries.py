@@ -1,4 +1,10 @@
-db_name = "hisab_bot"
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+db_name = os.getenv("BOT_DB_NAME")
 # create database
 create_db = f"Create database {db_name}"
 

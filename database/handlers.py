@@ -64,7 +64,7 @@ def delete_database():
 
     except Exception as e:
         print(e)
-        return False
+        raise e
 
 
 def initialize_users_table(

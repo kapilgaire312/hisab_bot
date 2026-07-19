@@ -173,7 +173,7 @@ async def clear_records(interaction):
 )
 @add_defer_decorator
 async def delete_expense(interaction, id: str):
-    response = delete_entry(id=id, user_id=interaction.user.id)
+    response = delete_entry(id=id, interaction=interaction)
     await interaction.followup.send(f"{response['message']}")
 
 

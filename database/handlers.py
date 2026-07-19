@@ -18,6 +18,7 @@ from database.queries import (
     export_query,
     get_balance_query,
     get_history_query,
+    get_listed_by_query,
     get_users,
     update_timestamp_query,
 )
@@ -219,3 +220,17 @@ def get_export_data():
     except Exception as e:
         print(e)
         raise e
+
+
+def get_listed_by_id(eid: int):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute(get_listed_by_query, (eid,))
+                listed_by_id = cur.fetchone()
+                print(listed_by_id)
+                return listed_by_id[0]
+
+            except Exception as e:
+                print(e)
+                raise e

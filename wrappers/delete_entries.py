@@ -5,6 +5,7 @@ from database.handlers import (
     delete_database,
     delete_expense_entry,
     delete_repayment_entry,
+    get_listed_by_id,
 )
 from utils.custom_errors import DeleteFailedError
 from utils.utils import check_admin_or_mod, check_user_initialized, returnMessage
@@ -28,9 +29,11 @@ def delete_enitre_db(interaction):
         return returnMessage(True, "Failed to delete the database.")
 
 
-def delete_entry(id: str, user_id):
+def delete_entry(id: str, interaction):
     try:
+        user_id = interaction.user.id
         is_initialized = check_user_initialized(user_id=user_id)
+        is_mod_or_admin = check_admin_or_mod(interaction=interaction)
 
         if not is_initialized:
             return returnMessage(True, "Failed to clear database. Not allowed!")
@@ -50,7 +53,19 @@ def delete_entry(id: str, user_id):
         int_id = int(clean_id[1:])
 
         if type == "e":
-            delete_expense_entry(eid=int_id)
+            if is_mod_or_admin:
+                delete_expense_entry(eid=int_id)
+
+            else:
+                listed_by_id = get_listed_by_id(eid=int_id)
+
+                if user_id != listed_by_id:
+                    return returnMessage(
+                        True,
+                        "Expense can only be deleted by user who listed it or by the mod/admin.",
+                    )
+
+                delete_expense_entry(eid=int_id)
 
         elif type == "p":
             delete_repayment_entry(pid=int_id)

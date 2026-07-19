@@ -221,3 +221,17 @@ Union all
  
     Order By added_date ASC;
 """
+
+
+get_listed_by_query = """
+Select listed_by
+from expenses
+Where eid=%s;
+
+"""
+
+get_sender_id_query = """
+Select sender
+from repayments
+where rid = %s;
+"""

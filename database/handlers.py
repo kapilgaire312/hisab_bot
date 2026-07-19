@@ -19,6 +19,7 @@ from database.queries import (
     get_balance_query,
     get_history_query,
     get_listed_by_query,
+    get_sender_id_query,
     get_users,
     update_timestamp_query,
 )
@@ -228,8 +229,20 @@ def get_listed_by_id(eid: int):
             try:
                 cur.execute(get_listed_by_query, (eid,))
                 listed_by_id = cur.fetchone()
-                print(listed_by_id)
                 return listed_by_id[0]
+
+            except Exception as e:
+                print(e)
+                raise e
+
+
+def get_sender_id(rid):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute(get_sender_id_query, (rid,))
+                sender_id = cur.fetchone()
+                return sender_id[0]
 
             except Exception as e:
                 print(e)

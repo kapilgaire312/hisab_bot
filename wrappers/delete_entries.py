@@ -6,6 +6,7 @@ from database.handlers import (
     delete_expense_entry,
     delete_repayment_entry,
     get_listed_by_id,
+    get_sender_id,
 )
 from utils.custom_errors import DeleteFailedError
 from utils.utils import check_admin_or_mod, check_user_initialized, returnMessage
@@ -68,7 +69,18 @@ def delete_entry(id: str, interaction):
                 delete_expense_entry(eid=int_id)
 
         elif type == "p":
-            delete_repayment_entry(pid=int_id)
+            if is_mod_or_admin:
+                delete_repayment_entry(pid=int_id)
+
+            else:
+                sender_id = get_sender_id(rid=int_id)
+
+                if sender_id != user_id:
+                    return returnMessage(
+                        True,
+                        "Repayment can only be deleted by sender or by the mod/admin.",
+                    )
+                delete_repayment_entry(pid=int_id)
 
         return returnMessage(
             False,
